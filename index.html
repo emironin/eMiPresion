@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JAE Salud Dashboard</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow:0 6px 18px rgba(15,23,42,.06);
+
+      --green:#16a34a;
+      --red:#dc2626;
+      --blue:#2563eb;
+      --orange:#f59e0b;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family:'Inter',system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding:16px;
+    }
+
+    .container{
+      max-width:1200px;
+      margin:auto;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .title h1{
+      font-size:1.5rem;
+      font-weight:700;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-top:4px;
+    }
+
+    .dashboard-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:18px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:20px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(229,231,235,.7);
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .form-group{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .form-group.full{
+      grid-column:1/-1;
+    }
+
+    label{
+      font-size:.88rem;
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    input{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      font-size:1rem;
+      outline:none;
+      transition:.2s;
+      background:#fff;
+    }
+
+    input:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 4px rgba(59,130,246,.12);
+    }
+
+    .btn-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    button{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:600;
+      cursor:pointer;
+      transition:.2s;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:.92rem;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+    }
+
+    .btn-primary{
+      background:#111827;
+      color:#fff;
+    }
+
+    .btn-secondary{
+      background:#fff;
+      color:#111827;
+      border:1px solid var(--border);
+    }
+
+    .btn-export{
+      background:#eef2ff;
+      color:#3730a3;
+    }
+
+    .section-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .section-title h2{
+      font-size:1.05rem;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+
+    .stat-card{
+      background:#f8fafc;
+      border-radius:16px;
+      padding:14px;
+      border:1px solid var(--border);
+    }
+
+    .stat-label{
+      font-size:.8rem;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:1.35rem;
+      font-weight:700;
+    }
+
+    .records{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+
+    .record-card{
+      background:#fff;
+      border-radius:18px;
+      padding:16px;
+      border:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .record-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+
+    .record-date{
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    .pressure{
+      font-size:1.6rem;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .pulse{
+      font-size:.95rem;
+      color:var(--muted);
+    }
+
+    .indicator{
+      font-size:1.3rem;
+      font-weight:700;
+    }
+
+    .indicator.low{
+      color:var(--blue);
+    }
+
+    .indicator.high{
+      color:var(--red);
+    }
+
+    .indicator.normal{
+      color:var(--green);
+    }
+
+    .tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .tag{
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:.78rem;
+      font-weight:600;
+    }
+
+    .tag-normal{
+      background:#dcfce7;
+      color:#166534;
+    }
+
+    .tag-high{
+      background:#fee2e2;
+      color:#991b1b;
+    }
+
+    .tag-low{
+      background:#dbeafe;
+      color:#1d4ed8;
+    }
+
+    .critical{
+      border:2px solid rgba(220,38,38,.45);
+      animation:pulseAlert 1.2s infinite;
+      background:linear-gradient(180deg,#fff,#fff5f5);
+    }
+
+    .critical-banner{
+      background:rgba(220,38,38,.1);
+      color:#991b1b;
+      border-radius:12px;
+      padding:10px;
+      font-size:.85rem;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .delete-btn{
+      position:absolute;
+      top:14px;
+      right:14px;
+      width:36px;
+      height:36px;
+      border-radius:12px;
+      background:#fef2f2;
+      color:#dc2626;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:32px 12px;
+    }
+
+    canvas{
+      width:100% !important;
+      max-height:320px;
+    }
+
+    @keyframes pulseAlert{
+      0%{ box-shadow:0 0 0 0 rgba(220,38,38,.25);}
+      70%{ box-shadow:0 0 0 12px rgba(220,38,38,0);}
+      100%{ box-shadow:0 0 0 0 rgba(220,38,38,0);}
+    }
+
+    @media(min-width:768px){
+      .dashboard-grid{
+        grid-template-columns:380px 1fr;
+        align-items:start;
+      }
+
+      .stats-grid{
+        grid-template-columns:repeat(4,1fr);
+      }
+
+      .records{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media(min-width:1100px){
+      .records{
+        grid-template-columns:repeat(3,1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="header">
+      <div class="title">
+        <i class="fa-solid fa-heart-pulse fa-2x" style="color:#dc2626;"></i>
+        <div>
+          <h1>JAE Salud Dashboard</h1>
+          <div class="subtitle">Seguimiento local de presión arterial y pulso</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+
+      <!-- FORM -->
+      <div class="card">
+        <div class="section-title">
+          <h2><i class="fa-solid fa-notes-medical"></i> Nueva Toma</h2>
+        </div>
+
+        <form id="healthForm">
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Fecha</label>
+              <input type="date" id="date" required>
+            </div>
+
+            <div class="form-group">
+              <label>Hora</label>
+              <input type="time" id="time" required>
+            </div>
+
+            <div class="form-group">
+              <label>Sistólica (SIST)</label>
+              <input type="number" id="systolic" placeholder="120" required>
+            </div>
+
+            <div class="form-group">
+              <label>Diastólica (DIAS)</label>
+              <input type="number" id="diastolic" placeholder="80" required>
+            </div>
+
+            <div class="form-group full">
+              <label>Pulso (BPM)</label>
+              <input type="number" id="pulse" placeholder="72" required>
+            </div>
+
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-primary">
+              <i class="fa-solid fa-plus"></i>
+              Guardar
+            </button>
+
+            <button type="button" class="btn-secondary" id="clearAllBtn">
+              <i class="fa-solid fa-trash"></i>
+              Borrar Todo
+            </button>
+          </div>
+        </form>
+
+        <div class="btn-row" style="margin-top:22px;">
+          <button class="btn-export" id="exportPDF">
+            <i class="fa-solid fa-file-pdf"></i>
+            PDF
+          </button>
+
+          <button class="btn-export" id="exportCSV">
+            <i class="fa-solid fa-file-csv"></i>
+            CSV
+          </button>
+
+          <button class="btn-export" id="exportJSON">
+            <i class="fa-solid fa-file-code"></i>
+            JSON
+          </button>
+
+          <button class="btn-export" id="importBtn">
+            <i class="fa-solid fa-upload"></i>
+            Importar
+          </button>
+
+          <input type="file" id="importFile" accept=".json" hidden>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div style="display:flex; flex-direction:column; gap:18px;">
+
+        <div class="card">
+          <div class="section-title">
+            <h2><i class="fa-solid fa-chart-line"></i> Tendencia</h2>
+          </div>
+
+          <div class="stats-grid">
+
+            <div class="stat-card">
+              <div class="stat-label">Promedio SIST</div>
+              <div class="stat-value" id="avgSys">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Promedio DIAS</div>
+              <div class="stat-value" id="avgDia">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Promedio BPM</div>
+              <div class="stat-value" id="avgPulse">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Registros</div>
+              <div class="stat-value" id="totalRecords">0</div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:24px;">
+            <canvas id="healthChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Últimas Tomas</h2>
+          </div>
+
+          <div class="records" id="recordsContainer"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+<script>
+  const STORAGE_KEY = "health_dashboard_records";
+
+  const form = document.getElementById("healthForm");
+  const recordsContainer = document.getElementById("recordsContainer");
+
+  const dateInput = document.getElementById("date");
+  const timeInput = document.getElementById("time");
+
+  const avgSys = document.getElementById("avgSys");
+  const avgDia = document.getElementById("avgDia");
+  const avgPulse = document.getElementById("avgPulse");
+  const totalRecords = document.getElementById("totalRecords");
+
+  const exportPDFBtn = document.getElementById("exportPDF");
+  const exportCSVBtn = document.getElementById("exportCSV");
+  const exportJSONBtn = document.getElementById("exportJSON");
+
+  const importBtn = document.getElementById("importBtn");
+  const importFile = document.getElementById("importFile");
+
+  const clearAllBtn = document.getElementById("clearAllBtn");
+
+  let records = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+  // AUTO DATE/TIME
+  function setCurrentDateTime(){
+    const now = new Date();
+
+    dateInput.value = now.toISOString().split("T")[0];
+
+    const hours = String(now.getHours()).padStart(2,"0");
+    const minutes = String(now.getMinutes()).padStart(2,"0");
+
+    timeInput.value = `${hours}:${minutes}`;
+  }
+
+  setCurrentDateTime();
+
+  // CHART
+  const ctx = document.getElementById("healthChart");
+
+  const chart = new Chart(ctx, {
+    type:"line",
+    data:{
+      labels:[],
+      datasets:[
+        {
+          label:"Sistólica",
+          data:[],
+          borderColor:"#dc2626",
+          backgroundColor:"rgba(220,38,38,.12)",
+          tension:.35,
+          fill:true
+        },
+        {
+          label:"Diastólica",
+          data:[],
+          borderColor:"#2563eb",
+          backgroundColor:"rgba(37,99,235,.08)",
+          tension:.35,
+          fill:true
+        },
+        {
+          label:"Pulso BPM",
+          data:[],
+          borderColor:"#16a34a",
+          backgroundColor:"rgba(22,163,74,.08)",
+          tension:.35,
+          fill:true
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          labels:{
+            usePointStyle:true
+          }
+        }
+      },
+      scales:{
+        y:{
+          beginAtZero:false,
+          grid:{
+            color:"rgba(0,0,0,.05)"
+          }
+        },
+        x:{
+          grid:{
+            display:false
+          }
+        }
+      }
+    }
+  });
+
+  // HEALTH LOGIC
+  function getStatus(sys,dia){
+    if(sys > 160 || dia > 100){
+      return {
+        label:"CRÍTICA",
+        class:"high",
+        indicator:"↑",
+        critical:true
+      };
+    }
+
+    if(sys < 110 || dia < 70){
+      return {
+        label:"BAJA",
+        class:"low",
+        indicator:"↓",
+        critical:false
+      };
+    }
+
+    if(sys > 135 || dia > 85){
+      return {
+        label:"ALTA",
+        class:"high",
+        indicator:"↑",
+        critical:false
+      };
+    }
+
+    return {
+      label:"NORMAL",
+      class:"normal",
+      indicator:"●",
+      critical:false
+    };
+  }
+
+  // SAVE
+  function saveRecords(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  }
+
+  // RENDER
+  function renderRecords(){
+
+    recordsContainer.innerHTML = "";
+
+    if(records.length === 0){
+      recordsContainer.innerHTML = `
+        <div class="empty">
+          <i class="fa-regular fa-face-smile fa-2x"></i>
+          <p style="margin-top:10px;">No hay registros todavía</p>
+        </div>
+      `;
+    }
+
+    const sorted = [...records].sort((a,b)=>{
+      return new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`);
+    });
+
+    sorted.forEach(record => {
+
+      const status = getStatus(record.sys, record.dia);
+
+      const card = document.createElement("div");
+      card.className = `record-card ${status.critical ? "critical" : ""}`;
+
+      card.innerHTML = `
+        <button class="delete-btn" onclick="deleteRecord('${record.id}')">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+
+        <div class="record-top">
+          <div>
+            <div class="record-date">
+              <i class="fa-regular fa-calendar"></i>
+              ${record.date}
+            </div>
+
+            <div class="record-date" style="margin-top:4px;">
+              <i class="fa-regular fa-clock"></i>
+              ${record.time}
+            </div>
+          </div>
+        </div>
+
+        <div class="pressure">
+          ${record.sys}/${record.dia}
+          <span class="indicator ${status.class}">
+            ${status.indicator}
+          </span>
+        </div>
+
+        <div class="pulse">
+          <i class="fa-solid fa-heart"></i>
+          ${record.pulse} BPM
+        </div>
+
+        <div class="tags">
+          <span class="tag tag-${status.class}">
+            ${status.label}
+          </span>
+        </div>
+
+        ${
+          status.critical
+            ? `
+            <div class="critical-banner">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              Alerta crítica: valores elevados
+            </div>
+            `
+            : ""
+        }
+      `;
+
+      recordsContainer.appendChild(card);
+    });
+
+    updateStats();
+    updateChart();
+  }
+
+  // STATS
+  function updateStats(){
+
+    totalRecords.textContent = records.length;
+
+    if(records.length === 0){
+      avgSys.textContent = 0;
+      avgDia.textContent = 0;
+      avgPulse.textContent = 0;
+      return;
+    }
+
+    const avgS = Math.round(records.reduce((a,b)=>a + Number(b.sys),0) / records.length);
+    const avgD = Math.round(records.reduce((a,b)=>a + Number(b.dia),0) / records.length);
+    const avgP = Math.round(records.reduce((a,b)=>a + Number(b.pulse),0) / records.length);
+
+    avgSys.textContent = avgS;
+    avgDia.textContent = avgD;
+    avgPulse.textContent = avgP;
+  }
+
+  // CHART UPDATE
+  function updateChart(){
+
+    const latest = [...records]
+      .sort((a,b)=>{
+        return new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`);
+      })
+      .slice(-10);
+
+    chart.data.labels = latest.map(r => `${r.date} ${r.time}`);
+
+    chart.data.datasets[0].data = latest.map(r => r.sys);
+    chart.data.datasets[1].data = latest.map(r => r.dia);
+    chart.data.datasets[2].data = latest.map(r => r.pulse);
+
+    chart.update();
+  }
+
+  // ADD RECORD
+  form.addEventListener("submit", (e)=>{
+    e.preventDefault();
+
+    const record = {
+      id: crypto.randomUUID(),
+      date: dateInput.value,
+      time: timeInput.value,
+      sys: Number(document.getElementById("systolic").value),
+      dia: Number(document.getElementById("diastolic").value),
+      pulse: Number(document.getElementById("pulse").value)
+    };
+
+    records.push(record);
+
+    saveRecords();
+    renderRecords();
+
+    form.reset();
+    setCurrentDateTime();
+  });
+
+  // DELETE
+  function deleteRecord(id){
+    records = records.filter(r => r.id !== id);
+    saveRecords();
+    renderRecords();
+  }
+
+  window.deleteRecord = deleteRecord;
+
+  // CLEAR ALL
+  clearAllBtn.addEventListener("click", ()=>{
+
+    if(!confirm("¿Eliminar todos los registros?")) return;
+
+    records = [];
+    saveRecords();
+    renderRecords();
+  });
+
+  // EXPORT CSV
+  exportCSVBtn.addEventListener("click", ()=>{
+
+    if(records.length === 0) return alert("No hay datos.");
+
+    const headers = ["Fecha","Hora","Sistólica","Diastólica","Pulso"];
+    const rows = records.map(r => [
+      r.date,
+      r.time,
+      r.sys,
+      r.dia,
+      r.pulse
+    ]);
+
+    const csv = [
+      headers.join(","),
+      ...rows.map(r => r.join(","))
+    ].join("\n");
+
+    downloadFile(csv, "health-data.csv", "text/csv");
+  });
+
+  // EXPORT JSON
+  exportJSONBtn.addEventListener("click", ()=>{
+
+    const json = JSON.stringify(records, null, 2);
+
+    downloadFile(json, "health-backup.json", "application/json");
+  });
+
+  // EXPORT PDF
+  exportPDFBtn.addEventListener("click", ()=>{
+
+    if(records.length === 0){
+      alert("No hay datos.");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Health Dashboard", 14, 20);
+
+    doc.setFontSize(11);
+
+    let y = 35;
+
+    records.forEach((r, index)=>{
+
+      const line = `${index + 1}. ${r.date} ${r.time} | ${r.sys}/${r.dia} | BPM ${r.pulse}`;
+
+      doc.text(line, 14, y);
+
+      y += 10;
+
+      if(y > 270){
+        doc.addPage();
+        y = 20;
+      }
+    });
+
+    doc.save("health-report.pdf");
+  });
+
+  // IMPORT JSON
+  importBtn.addEventListener("click", ()=>{
+    importFile.click();
+  });
+
+  importFile.addEventListener("change", (e)=>{
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+
+      try{
+        const imported = JSON.parse(event.target.result);
+
+        if(!Array.isArray(imported)){
+          throw new Error("Formato inválido");
+        }
+
+        records = imported;
+
+        saveRecords();
+        renderRecords();
+
+        alert("Datos restaurados correctamente.");
+
+      }catch(err){
+        alert("Error al importar JSON.");
+      }
+    };
+
+    reader.readAsText(file);
+  });
+
+  // DOWNLOAD
+  function downloadFile(content, fileName, type){
+
+    const blob = new Blob([content], { type });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = fileName;
+
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  }
+
+  // INIT
+  renderRecords();
+</script>
+
+</body>
+</html>
