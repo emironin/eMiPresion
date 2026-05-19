@@ -1,420 +1,311 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JAE Salud Dashboard</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <style>
-    :root{
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --shadow:0 6px 18px rgba(15,23,42,.06);
-
-      --green:#16a34a;
-      --red:#dc2626;
-      --blue:#2563eb;
-      --orange:#f59e0b;
-    }
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
-
-    body{
-      font-family:'Inter',system-ui,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;
-      padding:16px;
-    }
-
-    .container{
-      max-width:1200px;
-      margin:auto;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    .header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .title{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
-    .title h1{
-      font-size:1.5rem;
-      font-weight:700;
-    }
-
-    .subtitle{
-      color:var(--muted);
-      font-size:.92rem;
-      margin-top:4px;
-    }
-
-    .dashboard-grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:18px;
-    }
-
-    .card{
-      background:var(--card);
-      border-radius:20px;
-      padding:18px;
-      box-shadow:var(--shadow);
-      border:1px solid rgba(229,231,235,.7);
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    .form-group{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    .form-group.full{
-      grid-column:1/-1;
-    }
-
-    label{
-      font-size:.88rem;
-      color:var(--muted);
-      font-weight:600;
-    }
-
-    input{
-      width:100%;
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:12px;
-      font-size:1rem;
-      outline:none;
-      transition:.2s;
-      background:#fff;
-    }
-
-    input:focus{
-      border-color:#93c5fd;
-      box-shadow:0 0 0 4px rgba(59,130,246,.12);
-    }
-
-    .btn-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:16px;
-    }
-
-    button{
-      border:none;
-      border-radius:14px;
-      padding:12px 16px;
-      font-weight:600;
-      cursor:pointer;
-      transition:.2s;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:.92rem;
-    }
-
-    button:hover{
-      transform:translateY(-1px);
-    }
-
-    .btn-primary{
-      background:#111827;
-      color:#fff;
-    }
-
-    .btn-secondary{
-      background:#fff;
-      color:#111827;
-      border:1px solid var(--border);
-    }
-
-    .btn-export{
-      background:#eef2ff;
-      color:#3730a3;
-    }
-
-    .section-title{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:16px;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .section-title h2{
-      font-size:1.05rem;
-    }
-
-    .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-    }
-
-    .stat-card{
-      background:#f8fafc;
-      border-radius:16px;
-      padding:14px;
-      border:1px solid var(--border);
-    }
-
-    .stat-label{
-      font-size:.8rem;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .stat-value{
-      font-size:1.35rem;
-      font-weight:700;
-    }
-
-    .records{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:14px;
-    }
-
-    .record-card{
-      background:#fff;
-      border-radius:18px;
-      padding:16px;
-      border:1px solid var(--border);
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .record-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-    }
-
-    .record-date{
-      color:var(--muted);
-      font-size:.86rem;
-    }
-
-    .pressure{
-      font-size:1.6rem;
-      font-weight:700;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .pulse{
-      font-size:.95rem;
-      color:var(--muted);
-    }
-
-    .indicator{
-      font-size:1.3rem;
-      font-weight:700;
-    }
-
-    .indicator.low{
-      color:var(--blue);
-    }
-
-    .indicator.high{
-      color:var(--red);
-    }
-
-    .indicator.normal{
-      color:var(--green);
-    }
-
-    .indicator.warning{
-      color:#d97706;
-    }
-
-    .indicator.elevated{
-      color:#f59e0b;
-    }
-
-    .indicator.critical{
-      color:#dc2626;
-    }
-
-    .tags{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .tag{
-      padding:7px 10px;
-      border-radius:999px;
-      font-size:.78rem;
-      font-weight:600;
-    }
-
-    .tag-normal{
-      background:#dcfce7;
-      color:#166534;
-    }
-
-    .tag-high{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    .tag-low{
-      background:#dbeafe;
-      color:#1d4ed8;
-    }
-
-    .tag-warning{
-      background:#fef3c7;
-      color:#92400e;
-    }
-
-    .tag-elevated{
-      background:#fde68a;
-      color:#92400e;
-    }
-
-    .tag-critical{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    .critical{
-      border:2px solid rgba(220,38,38,.45);
-      animation:pulseAlert 1.2s infinite;
-      background:linear-gradient(180deg,#fff,#fff5f5);
-    }
-
-    .critical-banner{
-      background:rgba(220,38,38,.1);
-      color:#991b1b;
-      border-radius:12px;
-      padding:10px;
-      font-size:.85rem;
-      font-weight:700;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .delete-btn{
-      position:absolute;
-      top:14px;
-      right:14px;
-      width:36px;
-      height:36px;
-      border-radius:12px;
-      background:#fef2f2;
-      color:#dc2626;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:0;
-    }
-
-    .empty{
-      text-align:center;
-      color:var(--muted);
-      padding:32px 12px;
-    }
-
-    canvas{
-      width:100% !important;
-      max-height:320px;
-    }
-
-    @keyframes pulseAlert{
-      0%{ box-shadow:0 0 0 0 rgba(220,38,38,.25);}
-      70%{ box-shadow:0 0 0 12px rgba(220,38,38,0);}
-      100%{ box-shadow:0 0 0 0 rgba(220,38,38,0);}
-    }
-
-    @media(min-width:768px){
-      .dashboard-grid{
-        grid-template-columns:380px 1fr;
-        align-items:start;
-      }
-
-      .stats-grid{
-        grid-template-columns:repeat(4,1fr);
-      }
-
-      .records{
-        grid-template-columns:repeat(2,1fr);
-      }
-    }
-
-    @media(min-width:1100px){
-      .records{
-        grid-template-columns:repeat(3,1fr);
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAE Salud Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+:root{
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+
+  --green:#16a34a;
+  --blue:#2563eb;
+  --red:#dc2626;
+  --orange:#f59e0b;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding:16px;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:18px;
+  border:1px solid var(--border);
+  box-shadow:0 6px 18px rgba(0,0,0,.05);
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.header h1{
+  font-size:1.5rem;
+}
+
+.subtitle{
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.form-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.form-group.full{
+  grid-column:1/-1;
+}
+
+label{
+  font-size:.88rem;
+  color:var(--muted);
+  font-weight:600;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  outline:none;
+}
+
+.btn-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+
+button,
+.btn-import{
+  border:none;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:600;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+}
+
+.btn-primary{
+  background:#111827;
+  color:#fff;
+}
+
+.btn-secondary{
+  background:#fff;
+  border:1px solid var(--border);
+}
+
+.btn-export,
+.btn-import{
+  background:#eef2ff;
+  color:#3730a3;
+}
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.stat-card{
+  background:#f8fafc;
+  padding:14px;
+  border-radius:16px;
+}
+
+.stat-label{
+  font-size:.8rem;
+  color:var(--muted);
+}
+
+.stat-value{
+  font-size:1.4rem;
+  font-weight:700;
+  margin-top:4px;
+}
+
+.records{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.group{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.record-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  position:relative;
+}
+
+.record-date{
+  color:var(--muted);
+  font-size:.85rem;
+}
+
+.pressure{
+  font-size:1.7rem;
+  font-weight:700;
+  margin-top:12px;
+}
+
+.pulse{
+  margin-top:10px;
+  color:var(--muted);
+}
+
+.tag{
+  margin-top:12px;
+  display:inline-block;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:.78rem;
+  font-weight:700;
+}
+
+.tag-normal{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.tag-low{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.tag-warning{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.tag-high{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.tag-critical{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.critical{
+  border:2px solid rgba(220,38,38,.5);
+}
+
+.delete-btn{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  background:#fef2f2;
+  color:#dc2626;
+}
+
+.empty{
+  text-align:center;
+  padding:40px;
+  color:var(--muted);
+}
+
+canvas{
+  margin-top:20px;
+  max-height:320px;
+}
+
+@media(max-width:768px){
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .group{
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-  <div class="header">
-    <div class="title">
+  <div class="card">
+
+    <div class="header">
       <i class="fa-solid fa-heart-pulse fa-2x" style="color:#dc2626;"></i>
+
       <div>
         <h1>JAE Salud Dashboard</h1>
-        <div class="subtitle">Seguimiento local de presión arterial y pulso</div>
+
+        <div class="subtitle">
+          Seguimiento de presión arterial
+        </div>
       </div>
     </div>
+
   </div>
 
   <div class="dashboard-grid">
 
     <div class="card">
 
-      <div class="section-title">
-        <h2><i class="fa-solid fa-notes-medical"></i> Nueva Toma</h2>
-      </div>
+      <h2>Nueva Toma</h2>
 
       <form id="healthForm">
 
@@ -432,22 +323,23 @@
 
           <div class="form-group">
             <label>Sistólica</label>
-            <input type="number" id="systolic" placeholder="120" required>
+            <input type="number" id="systolic" required>
           </div>
 
           <div class="form-group">
             <label>Diastólica</label>
-            <input type="number" id="diastolic" placeholder="80" required>
+            <input type="number" id="diastolic" required>
           </div>
 
           <div class="form-group full">
             <label>Pulso BPM</label>
-            <input type="number" id="pulse" placeholder="72" required>
+            <input type="number" id="pulse" required>
           </div>
 
         </div>
 
         <div class="btn-row">
+
           <button type="submit" class="btn-primary">
             <i class="fa-solid fa-plus"></i>
             Guardar
@@ -457,85 +349,76 @@
             <i class="fa-solid fa-trash"></i>
             Borrar Todo
           </button>
+
         </div>
 
       </form>
 
-      <div class="btn-row" style="margin-top:22px;">
+      <div class="btn-row">
 
-        <button class="btn-export" id="exportPDF">
-          <i class="fa-solid fa-file-pdf"></i>
+        <button type="button" class="btn-export" id="exportPDF">
           PDF
         </button>
 
-        <button class="btn-export" id="exportCSV">
-          <i class="fa-solid fa-file-csv"></i>
+        <button type="button" class="btn-export" id="exportCSV">
           CSV
         </button>
 
-        <button class="btn-export" id="exportJSON">
-          <i class="fa-solid fa-file-code"></i>
+        <button type="button" class="btn-export" id="exportJSON">
           JSON
         </button>
 
-        <button class="btn-export" id="importBtn">
+        <label for="importFile" class="btn-import">
           <i class="fa-solid fa-upload"></i>
           Importar
-        </button>
+        </label>
 
-        <input type="file" id="importFile" accept=".json" hidden>
+        <input
+          type="file"
+          id="importFile"
+          accept=".json"
+          style="display:none;"
+        >
 
       </div>
 
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:18px;">
+    <div class="card">
 
-      <div class="card">
+      <div class="stats-grid">
 
-        <div class="section-title">
-          <h2><i class="fa-solid fa-chart-line"></i> Tendencia</h2>
+        <div class="stat-card">
+          <div class="stat-label">Promedio SIST</div>
+          <div class="stat-value" id="avgSys">0</div>
         </div>
 
-        <div class="stats-grid">
-
-          <div class="stat-card">
-            <div class="stat-label">Promedio SIST</div>
-            <div class="stat-value" id="avgSys">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Promedio DIAS</div>
-            <div class="stat-value" id="avgDia">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Promedio BPM</div>
-            <div class="stat-value" id="avgPulse">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Registros</div>
-            <div class="stat-value" id="totalRecords">0</div>
-          </div>
-
+        <div class="stat-card">
+          <div class="stat-label">Promedio DIAS</div>
+          <div class="stat-value" id="avgDia">0</div>
         </div>
 
-        <div style="margin-top:24px;">
-          <canvas id="healthChart"></canvas>
+        <div class="stat-card">
+          <div class="stat-label">Promedio BPM</div>
+          <div class="stat-value" id="avgPulse">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Registros</div>
+          <div class="stat-value" id="totalRecords">0</div>
         </div>
 
       </div>
 
-      <div class="card">
+      <canvas id="healthChart"></canvas>
 
-        <div class="section-title">
-          <h2><i class="fa-solid fa-clock-rotate-left"></i> Últimas Tomas</h2>
-        </div>
+    </div>
 
-        <div class="records" id="recordsContainer"></div>
+    <div class="card">
 
-      </div>
+      <h2>Últimas Tomas</h2>
+
+      <div class="records" id="recordsContainer"></div>
 
     </div>
 
@@ -545,337 +428,397 @@
 
 <script>
 
-const STORAGE_KEY = 'health_dashboard_records';
+const STORAGE_KEY = "health_dashboard_records";
 
-const form = document.getElementById('healthForm');
-const recordsContainer = document.getElementById('recordsContainer');
+const form = document.getElementById("healthForm");
 
-const dateInput = document.getElementById('date');
-const timeInput = document.getElementById('time');
+const dateInput = document.getElementById("date");
+const timeInput = document.getElementById("time");
 
-const avgSys = document.getElementById('avgSys');
-const avgDia = document.getElementById('avgDia');
-const avgPulse = document.getElementById('avgPulse');
-const totalRecords = document.getElementById('totalRecords');
+const avgSys = document.getElementById("avgSys");
+const avgDia = document.getElementById("avgDia");
+const avgPulse = document.getElementById("avgPulse");
+const totalRecords = document.getElementById("totalRecords");
 
-const exportPDFBtn = document.getElementById('exportPDF');
-const exportCSVBtn = document.getElementById('exportCSV');
-const exportJSONBtn = document.getElementById('exportJSON');
-
-const clearAllBtn = document.getElementById('clearAllBtn');
-
-const importBtn = document.getElementById('importBtn');
-const importFile = document.getElementById('importFile');
+const recordsContainer = document.getElementById("recordsContainer");
 
 let records = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-function setCurrentDateTime() {
+function setCurrentDateTime(){
+
   const now = new Date();
 
-  dateInput.value = now.toISOString().split('T')[0];
+  dateInput.value = now.toISOString().split("T")[0];
 
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const h = String(now.getHours()).padStart(2,"0");
+  const m = String(now.getMinutes()).padStart(2,"0");
 
-  timeInput.value = `${hours}:${minutes}`;
+  timeInput.value = `${h}:${m}`;
 }
 
 setCurrentDateTime();
 
-const ctx = document.getElementById('healthChart');
+function getStatus(sys,dia){
 
-const chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: [],
-    datasets: [
-      {
-        label: 'Sistólica',
-        data: [],
-        borderColor: '#dc2626',
-        backgroundColor: 'rgba(220,38,38,.12)',
-        tension: .35,
-        fill: true
-      },
-      {
-        label: 'Diastólica',
-        data: [],
-        borderColor: '#2563eb',
-        backgroundColor: 'rgba(37,99,235,.08)',
-        tension: .35,
-        fill: true
-      },
-      {
-        label: 'Pulso BPM',
-        data: [],
-        borderColor: '#16a34a',
-        backgroundColor: 'rgba(22,163,74,.08)',
-        tension: .35,
-        fill: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-function getStatus(sys, dia) {
-
-  if (sys >= 180 || dia >= 120) {
+  if(sys >= 180 || dia >= 120){
     return {
-      label: 'CRÍTICA',
-      class: 'critical',
-      indicator: '⬆',
-      critical: true
+      label:"CRÍTICA",
+      class:"critical"
     };
   }
 
-  if (sys >= 140 || dia >= 90) {
+  if(sys >= 140 || dia >= 90){
     return {
-      label: 'ALTA',
-      class: 'high',
-      indicator: '↑',
-      critical: false
+      label:"ALTA",
+      class:"high"
     };
   }
 
-  if (sys >= 130 || dia >= 80) {
+  if(sys >= 130 || dia >= 80){
     return {
-      label: 'ELEVADA',
-      class: 'elevated',
-      indicator: '▲',
-      critical: false
+      label:"ELEVADA",
+      class:"warning"
     };
   }
 
-  if (sys >= 120 && sys <= 129 && dia < 80) {
+  if(sys < 90 || dia < 60){
     return {
-      label: 'LIGERAMENTE ELEVADA',
-      class: 'warning',
-      indicator: '●',
-      critical: false
-    };
-  }
-
-  if (sys < 90 || dia < 60) {
-    return {
-      label: 'BAJA',
-      class: 'low',
-      indicator: '↓',
-      critical: false
+      label:"BAJA",
+      class:"low"
     };
   }
 
   return {
-    label: 'NORMAL',
-    class: 'normal',
-    indicator: '●',
-    critical: false
+    label:"NORMAL",
+    class:"normal"
   };
 }
 
-function validateRecord(sys, dia, pulse) {
-
-  if (sys < 50 || sys > 300) {
-    alert('Valor sistólico inválido');
-    return false;
-  }
-
-  if (dia < 30 || dia > 200) {
-    alert('Valor diastólico inválido');
-    return false;
-  }
-
-  if (pulse < 20 || pulse > 250) {
-    alert('Valor de pulso inválido');
-    return false;
-  }
-
-  if (dia >= sys) {
-    alert('La diastólica no puede ser mayor o igual a la sistólica');
-    return false;
-  }
-
-  return true;
-}
-
-function saveRecords() {
+function saveRecords(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 }
 
-function updateStats() {
+function renderRecords(){
 
-  totalRecords.textContent = records.length;
+  recordsContainer.innerHTML = "";
 
   if(records.length === 0){
-    avgSys.textContent = 0;
-    avgDia.textContent = 0;
-    avgPulse.textContent = 0;
+
+    recordsContainer.innerHTML = `
+      <div class="empty">
+        No hay registros todavía
+      </div>
+    `;
+
+    updateStats();
+    updateChart();
+
     return;
   }
 
-  const avgS = Math.round(records.reduce((a,b)=> a + b.sys,0) / records.length);
-  const avgD = Math.round(records.reduce((a,b)=> a + b.dia,0) / records.length);
-  const avgP = Math.round(records.reduce((a,b)=> a + b.pulse,0) / records.length);
+  // AGRUPAR POR FECHA
+  const groupedByDate = {};
 
-  avgSys.textContent = avgS;
-  avgDia.textContent = avgD;
-  avgPulse.textContent = avgP;
-}
+  records.forEach(record => {
 
-function updateChart() {
+    if(!groupedByDate[record.date]){
+      groupedByDate[record.date] = [];
+    }
 
-  const latest = [...records]
-  .sort((a,b)=> new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`))
-  .slice(-10);
+    groupedByDate[record.date].push(record);
 
-  chart.data.labels = latest.map(r => `${r.date} ${r.time}`);
-
-  chart.data.datasets[0].data = latest.map(r => r.sys);
-  chart.data.datasets[1].data = latest.map(r => r.dia);
-  chart.data.datasets[2].data = latest.map(r => r.pulse);
-
-  chart.update();
-}
-
-function renderRecords() {
-
-  recordsContainer.innerHTML = '';
-
-  if(records.length === 0){
-    recordsContainer.innerHTML = `
-      <div class="empty">
-        <i class="fa-regular fa-face-smile fa-2x"></i>
-        <p style="margin-top:10px;">No hay registros todavía</p>
-      </div>
-    `;
-  }
-
-  const sorted = [...records].sort((a,b)=> {
-    return new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`);
   });
 
-  sorted.forEach(record => {
+  // ORDENAR FECHAS
+  const sortedDates = Object.keys(groupedByDate)
+  .sort((a,b)=> new Date(b) - new Date(a));
 
-    const status = getStatus(record.sys, record.dia);
+  sortedDates.forEach(date => {
 
-    const card = document.createElement('div');
+    const dailyRecords = groupedByDate[date]
 
-    card.className = `record-card ${status.critical ? 'critical' : ''}`;
+    .sort((a,b)=>{
+      return a.time.localeCompare(b.time);
+    });
 
-    card.innerHTML = `
+    const group = document.createElement("div");
 
-      <button class="delete-btn" onclick="deleteRecord('${record.id}')">
+    group.className = "group";
+
+    // PRIMERA TOMA
+    const first = dailyRecords[0];
+
+    const firstStatus = getStatus(
+      first.sys,
+      first.dia
+    );
+
+    const firstCard = document.createElement("div");
+
+    firstCard.className = `
+      record-card
+      ${firstStatus.class === "critical" ? "critical" : ""}
+    `;
+
+    firstCard.innerHTML = `
+      <button
+        class="delete-btn"
+        onclick="deleteRecord('${first.id}')"
+      >
         <i class="fa-solid fa-trash"></i>
       </button>
 
-      <div class="record-top">
-        <div>
-          <div class="record-date">
-            <i class="fa-regular fa-calendar"></i>
-            ${record.date}
-          </div>
+      <div class="record-date">
+        <strong>${date}</strong>
+      </div>
 
-          <div class="record-date" style="margin-top:4px;">
-            <i class="fa-regular fa-clock"></i>
-            ${record.time}
-          </div>
-        </div>
+      <div class="record-date" style="margin-top:4px;">
+        🌅 ${first.time}
       </div>
 
       <div class="pressure">
-        ${record.sys}/${record.dia}
-
-        <span class="indicator ${status.class}">
-          ${status.indicator}
-        </span>
+        ${first.sys}/${first.dia}
       </div>
 
       <div class="pulse">
-        <i class="fa-solid fa-heart"></i>
-        ${record.pulse} BPM
+        ${first.pulse} BPM
       </div>
 
-      <div class="tags">
-        <span class="tag tag-${status.class}">
-          ${status.label}
-        </span>
+      <div class="tag tag-${firstStatus.class}">
+        ${firstStatus.label}
       </div>
-
-      ${status.critical ? `
-        <div class="critical-banner">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          Crisis hipertensiva: buscar atención médica
-        </div>
-      ` : ''}
-
     `;
 
-    recordsContainer.appendChild(card);
+    group.appendChild(firstCard);
+
+    // SEGUNDA TOMA
+    if(dailyRecords.length > 1){
+
+      const second = dailyRecords[1];
+
+      const secondStatus = getStatus(
+        second.sys,
+        second.dia
+      );
+
+      const secondCard = document.createElement("div");
+
+      secondCard.className = `
+        record-card
+        ${secondStatus.class === "critical" ? "critical" : ""}
+      `;
+
+      secondCard.innerHTML = `
+        <button
+          class="delete-btn"
+          onclick="deleteRecord('${second.id}')"
+        >
+          <i class="fa-solid fa-trash"></i>
+        </button>
+
+        <div class="record-date">
+          <strong>${date}</strong>
+        </div>
+
+        <div class="record-date" style="margin-top:4px;">
+          🌙 ${second.time}
+        </div>
+
+        <div class="pressure">
+          ${second.sys}/${second.dia}
+        </div>
+
+        <div class="pulse">
+          ${second.pulse} BPM
+        </div>
+
+        <div class="tag tag-${secondStatus.class}">
+          ${secondStatus.label}
+        </div>
+      `;
+
+      group.appendChild(secondCard);
+    }
+
+    recordsContainer.appendChild(group);
+
   });
 
   updateStats();
   updateChart();
 }
 
-form.addEventListener('submit', (e)=> {
+function updateStats(){
 
-  e.preventDefault();
+  totalRecords.textContent = records.length;
 
-  const sys = Number(document.getElementById('systolic').value);
-  const dia = Number(document.getElementById('diastolic').value);
-  const pulse = Number(document.getElementById('pulse').value);
+  if(records.length === 0){
 
-  if(!validateRecord(sys, dia, pulse)) {
+    avgSys.textContent = 0;
+    avgDia.textContent = 0;
+    avgPulse.textContent = 0;
+
     return;
   }
 
-  const record = {
-    id: crypto.randomUUID(),
-    date: dateInput.value,
-    time: timeInput.value,
+  avgSys.textContent = Math.round(
+    records.reduce((a,b)=>a+b.sys,0) / records.length
+  );
+
+  avgDia.textContent = Math.round(
+    records.reduce((a,b)=>a+b.dia,0) / records.length
+  );
+
+  avgPulse.textContent = Math.round(
+    records.reduce((a,b)=>a+b.pulse,0) / records.length
+  );
+}
+
+const chart = new Chart(
+  document.getElementById("healthChart"),
+  {
+    type:"line",
+    data:{
+      labels:[],
+      datasets:[
+        {
+          label:"Sistólica",
+          data:[],
+          borderColor:"#dc2626",
+          tension:.35
+        },
+        {
+          label:"Diastólica",
+          data:[],
+          borderColor:"#2563eb",
+          tension:.35
+        }
+      ]
+    },
+    options:{
+      responsive:true
+    }
+  }
+);
+
+function updateChart(){
+
+  const latest = [...records]
+  .sort((a,b)=>{
+    return new Date(`${a.date}T${a.time}`) -
+           new Date(`${b.date}T${b.time}`);
+  })
+  .slice(-10);
+
+  chart.data.labels = latest.map(
+    r => `${r.date} ${r.time}`
+  );
+
+  chart.data.datasets[0].data = latest.map(r=>r.sys);
+  chart.data.datasets[1].data = latest.map(r=>r.dia);
+
+  chart.update();
+}
+
+form.addEventListener("submit",(e)=>{
+
+  e.preventDefault();
+
+  const sys = Number(
+    document.getElementById("systolic").value
+  );
+
+  const dia = Number(
+    document.getElementById("diastolic").value
+  );
+
+  const pulse = Number(
+    document.getElementById("pulse").value
+  );
+
+  records.push({
+    id:crypto.randomUUID(),
+    date:dateInput.value,
+    time:timeInput.value,
     sys,
     dia,
     pulse
-  };
-
-  records.push(record);
+  });
 
   saveRecords();
+
   renderRecords();
 
   form.reset();
+
   setCurrentDateTime();
+
 });
 
-function deleteRecord(id) {
-  records = records.filter(r => r.id !== id);
+function deleteRecord(id){
+
+  records = records.filter(r=>r.id !== id);
+
   saveRecords();
+
   renderRecords();
 }
 
 window.deleteRecord = deleteRecord;
 
-clearAllBtn.addEventListener('click', ()=> {
+document.getElementById("clearAllBtn")
+.addEventListener("click",()=>{
 
-  if(!confirm('¿Eliminar todos los registros?')) return;
-
-  records = [];
-  saveRecords();
-  renderRecords();
-});
-
-exportCSVBtn.addEventListener('click', ()=> {
-
-  if(records.length === 0){
-    alert('No hay datos');
+  if(!confirm("¿Eliminar todos los registros?")){
     return;
   }
 
-  const headers = ['Fecha','Hora','Sistólica','Diastólica','Pulso'];
+  records = [];
 
+  saveRecords();
+
+  renderRecords();
+});
+
+document.getElementById("exportPDF")
+.addEventListener("click",()=>{
+
+  if(records.length === 0){
+    alert("No hay datos para exportar");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text("Reporte de presión arterial", 14, 20);
+
+  doc.setFontSize(11);
+  let y = 30;
+
+  records.forEach((r,index)=>{
+    const line = `${index + 1}. ${r.date} ${r.time} - ${r.sys}/${r.dia} mmHg - ${r.pulse} BPM`;
+    doc.text(line, 14, y);
+    y += 8;
+    if(y > 280){
+      doc.addPage();
+      y = 20;
+    }
+  });
+
+  doc.save("reporte-presion.pdf");
+});
+
+document.getElementById("exportCSV")
+.addEventListener("click",()=>{
+
+  if(records.length === 0){
+    alert("No hay datos para exportar");
+    return;
+  }
+
+  const headers = ["Fecha","Hora","Sistólica","Diastólica","Pulso"];
   const rows = records.map(r => [
     r.date,
     r.time,
@@ -884,111 +827,105 @@ exportCSVBtn.addEventListener('click', ()=> {
     r.pulse
   ]);
 
-  const csv = [
-    headers.join(','),
-    ...rows.map(r => r.join(','))
-  ].join('\n');
+  const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
 
-  downloadFile(csv, 'health-data.csv', 'text/csv');
+  downloadFile(csv, "datos-presion.csv", "text/csv");
 });
 
-exportJSONBtn.addEventListener('click', ()=> {
+document.getElementById("exportJSON")
+.addEventListener("click",()=>{
 
-  const json = JSON.stringify(records, null, 2);
+  const json = JSON.stringify(records,null,2);
 
-  downloadFile(json, 'health-backup.json', 'application/json');
+  downloadFile(
+    json,
+    "respaldo-salud.json",
+    "application/json"
+  );
 });
 
-exportPDFBtn.addEventListener('click', ()=> {
+function downloadFile(content,fileName,type){
 
-  if(records.length === 0){
-    alert('No hay datos');
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-
-  const doc = new jsPDF();
-
-  doc.setFontSize(18);
-  doc.text('Reporte de Presión Arterial', 14, 20);
-
-  doc.setFontSize(11);
-
-  let y = 35;
-
-  records.forEach((r, index)=> {
-
-    const line = `${index + 1}. ${r.date} ${r.time} | ${r.sys}/${r.dia} | BPM ${r.pulse}`;
-
-    doc.text(line, 14, y);
-
-    y += 10;
-
-    if(y > 270){
-      doc.addPage();
-      y = 20;
-    }
-  });
-
-  doc.save('reporte-presion.pdf');
-});
-
-// IMPORTAR JSON
-importBtn.addEventListener('click', ()=> {
-  importFile.click();
-});
-
-importFile.addEventListener('change', (e)=> {
-
-  const file = e.target.files[0];
-
-  if(!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = function(event){
-
-    try {
-
-      const imported = JSON.parse(event.target.result);
-
-      if(!Array.isArray(imported)) {
-        throw new Error('Formato inválido');
-      }
-
-      records = imported;
-
-      saveRecords();
-      renderRecords();
-
-      alert('Backup restaurado correctamente');
-
-    } catch(err) {
-      alert('Error al importar el archivo JSON');
-    }
-  };
-
-  reader.readAsText(file);
-});
-
-function downloadFile(content, fileName, type) {
-
-  const blob = new Blob([content], { type });
+  const blob = new Blob(
+    [content],
+    { type }
+  );
 
   const url = URL.createObjectURL(blob);
 
-  const a = document.createElement('a');
+  const a = document.createElement("a");
 
   a.href = url;
   a.download = fileName;
 
   document.body.appendChild(a);
+
   a.click();
+
   a.remove();
 
   URL.revokeObjectURL(url);
 }
+
+const importInput =
+document.getElementById("importFile");
+
+importInput.addEventListener(
+  "change",
+  function(event){
+
+    const file = event.target.files[0];
+
+    if(!file){
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+      try{
+
+        const importedData =
+        JSON.parse(e.target.result);
+
+        if(!Array.isArray(importedData)){
+          throw new Error("Formato inválido");
+        }
+
+        records.length = 0;
+
+        importedData.forEach(item=>{
+
+          records.push({
+            id:item.id || crypto.randomUUID(),
+            date:item.date,
+            time:item.time,
+            sys:Number(item.sys),
+            dia:Number(item.dia),
+            pulse:Number(item.pulse)
+          });
+
+        });
+
+        saveRecords();
+
+        renderRecords();
+
+        alert("Backup importado correctamente");
+
+      }catch(error){
+
+        console.error(error);
+
+        alert("Error al importar JSON");
+      }
+    };
+
+    reader.readAsText(file);
+
+    event.target.value = "";
+});
 
 renderRecords();
 
