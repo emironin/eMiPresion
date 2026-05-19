@@ -170,6 +170,29 @@ button,
   margin-top:4px;
 }
 
+.reference-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+}
+
+.reference-table th,
+.reference-table td{
+  padding:12px 14px;
+  border:1px solid var(--border);
+  text-align:left;
+}
+
+.reference-table th{
+  background:#f8fafc;
+  color:var(--text);
+  font-weight:700;
+}
+
+.reference-table td{
+  color:var(--muted);
+}
+
 .records{
   display:flex;
   flex-direction:column;
@@ -412,6 +435,26 @@ canvas{
 
       <canvas id="healthChart"></canvas>
 
+      <div style="margin-top:22px;">
+        <h2>Referencia de valores</h2>
+        <table class="reference-table">
+          <thead>
+            <tr>
+              <th>Valor</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>118/78</td><td>NORMAL</td></tr>
+            <tr><td>125/76</td><td>ELEVADA</td></tr>
+            <tr><td>132/82</td><td>HIPERTENSIÓN G1</td></tr>
+            <tr><td>145/92</td><td>HIPERTENSIÓN G2</td></tr>
+            <tr><td>182/121</td><td>CRÍTICA</td></tr>
+            <tr><td>85/55</td><td>BAJA</td></tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
 
     <div class="card">
@@ -458,39 +501,99 @@ function setCurrentDateTime(){
 
 setCurrentDateTime();
 
-function getStatus(sys,dia){
+function getStatus(sys, dia) {
 
-  if(sys >= 180 || dia >= 120){
+  // VALIDACIONES
+  if (
+    isNaN(sys) ||
+    isNaN(dia) ||
+    sys <= 0 ||
+    dia <= 0
+  ) {
     return {
-      label:"CRÍTICA",
-      class:"critical"
+      label: "Inválida",
+      class: "warning",
+      indicator: "?"
     };
   }
 
-  if(sys >= 140 || dia >= 90){
+  // VALORES FISIOLÓGICAMENTE IMPOSIBLES
+  if (
+    sys < 50 ||
+    sys > 260 ||
+    dia < 30 ||
+    dia > 160
+  ) {
     return {
-      label:"ALTA",
-      class:"high"
+      label: "⚠ ERROR",
+      class: "critical",
+      indicator: "⚠",
+      critical: true
     };
   }
 
-  if(sys >= 130 || dia >= 80){
+  // CRISIS HIPERTENSIVA
+  if (sys >= 180 || dia >= 120) {
     return {
-      label:"ELEVADA",
-      class:"warning"
+      label: "CRÍTICA",
+      class: "critical",
+      indicator: "↑↑",
+      critical: true
     };
   }
 
-  if(sys < 90 || dia < 60){
+  // HIPERTENSIÓN GRADO 2
+  if (sys >= 140 || dia >= 90) {
     return {
-      label:"BAJA",
-      class:"low"
+      label: "HIPERTENSIÓN G2",
+      class: "high",
+      indicator: "↑",
+      critical: false
     };
   }
 
+  // HIPERTENSIÓN GRADO 1
+  if (
+    (sys >= 130 && sys <= 139) ||
+    (dia >= 80 && dia <= 89)
+  ) {
+    return {
+      label: "HIPERTENSIÓN G1",
+      class: "warning",
+      indicator: "↑",
+      critical: false
+    };
+  }
+
+  // PRESIÓN ELEVADA
+  if (
+    (sys >= 120 && sys <= 129) &&
+    dia < 80
+  ) {
+    return {
+      label: "ELEVADA",
+      class: "warning",
+      indicator: "•",
+      critical: false
+    };
+  }
+
+  // HIPOTENSIÓN
+  if (sys < 90 || dia < 60) {
+    return {
+      label: "BAJA",
+      class: "low",
+      indicator: "↓",
+      critical: false
+    };
+  }
+
+  // NORMAL
   return {
-    label:"NORMAL",
-    class:"normal"
+    label: "NORMAL",
+    class: "normal",
+    indicator: "✓",
+    critical: false
   };
 }
 
